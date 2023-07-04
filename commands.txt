@@ -1,0 +1,1 @@
+mips-linux-gnu-as assembly.asm -o assembly.o && mips-linux-gnu-gcc assembly.o -o assembly -nostdlib -static && qemu-mips assembly && rm assembly assembly.o

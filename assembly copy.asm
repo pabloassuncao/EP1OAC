@@ -4,7 +4,7 @@ matriz: .word 1, 2, 3, 4, 5, 6, 7, 8, 9                 # Matriz row-major order
 n: .word 3                                              # Tamanho da matriz
 m: .word 3                                              # Tamanho da matriz
 x: .word 1                                              # Número da linha i para calcular a média
-y: .word 1                                              # Número da coluna j para calcular a média
+y: .word 0                                              # Número da coluna j para calcular a média
 
 .text
 
@@ -42,7 +42,7 @@ main:
     jal     get_pos
     add     $s3,            $s3,        $v0             # $s3 = soma + valor da posição válida
     add     $s4,            $s4,        $v1             # $s4 = contador + posição válida
-    # Save parameters on the stack
+                                                        # Save parameters on the stack
     subu    $sp,            $sp,        8               # Subtract 8 bytes from stack pointer
 
     sw      $s3,            0($sp)                      # Store $s3 on the stack
@@ -51,29 +51,40 @@ main:
 
 
 calc_and_print:
-    # Access parameters in the callee
+                                                        # Access parameters in the callee
     lw      $t0,            0($sp)                      # Load $s3 from the stack into $t0
     lw      $t1,            4($sp)                      # Load $s4 from the stack into $t1
-    # Clean up the stack
+                                                        # Clean up the stack
     addu    $sp,            $sp,        8               # Add 8 bytes back to the stack pointer
-    # Realiza a divisão da soma pelo contador em ponto flutuante
+                                                        # Realiza a divisão da soma pelo contador em ponto flutuante
     mtc1    $t0,            $f4                         # $f0 = soma
     mtc1    $t1,            $f2                         # $f1 = contador
     cvt.s.w $f4,            $f4                         # $f0 = soma
     cvt.s.w $f2,            $f2                         # $f1 = contador
     div.s   $f6,            $f4,        $f2             # $f0 = soma / contador
 
+    li      $t0,            10                          # $t0 = 10
+    mtc1    $t0,            $f2                         # $f2 = 10
+    cvt.s.w $f2,            $f2                         # $f2 = 10
+    mul.s   $f6,            $f6,        $f2             # $f0 = soma * 10
+    # make the float with only 2 decimal places
+    trunc.w.s $f6,          $f6                         # $f0 = soma * 10
+    cvt.s.w $f6,            $f6                         # $f0 = soma * 10
+    div.s   $f6,            $f6,        $f2             # $f0 = soma * 10 / 10
+
     la      $a0,            result_msg                  # $a0 = "A média aritmética é: "
     li      $v0,            4                           # $v0 = print_string
     syscall 
-    mov.s   $f12,           $f6                         # $f12 = $f0
+
+# Convert the float number to a string
     li      $v0,            2                           # $v0 = print_float
+    mov.s   $f12,           $f6                         # $f12 = $f6
     syscall 
     li      $v0,            10                          # $v0 = exit
     syscall 
 
 get_pos:
-    # Salva o primeiro endereço de retorno para a main antes de chamar outra função
+                                                        # Salva o primeiro endereço de retorno para a main antes de chamar outra função
     sw      $ra,            0($sp)                      # Salva o endereço de retorno para a main
     addi    $sp,            $sp,        -4              # Decrementa o ponteiro da pilha
     move    $a2,            $s1                         # $a2 = n
@@ -92,13 +103,13 @@ get_pos:
     jr      $ra                                         # Retorna para a função chamadora
 
 check_pos:
-    # Salva o primeiro endereço de retorno para a validate antes de chamar outra função
+                                                        # Salva o primeiro endereço de retorno para a validate antes de chamar outra função
     sw      $ra,            0($sp)                      # Salva o endereço de retorno para a main
     addi    $sp,            $sp,        -4              # Decrementa o ponteiro da pilha
     jal     check_x_value
     move    $t2,            $v0                         # $t2 = As duas são verdadeiras para x
     jal     check_y_value
-    # Atualiza o endereço de retorno para a main
+                                                        # Atualiza o endereço de retorno para a main
     lw      $ra,            4($sp)                      # Carrega o endereço de retorno para a main
     addi    $sp,            $sp,        4               # Incrementa o ponteiro da pilha
     move    $t3,            $v0                         # $t3 = As duas são verdadeiras para y

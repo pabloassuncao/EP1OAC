@@ -1,16 +1,18 @@
-function adjAverage(matrix, i, j) {
-    let sum = 0;
-    let count = 0;
-		
-    for (let x = i - 1; x <= i + 1; x++) {
-      for (let y = j - 1; y <= j + 1; y++) {
-        if (x >= 0 && x < matrix.length && y >= 0 && y < matrix[0].length && (x == i || y == j) && (x != i || y != j)) {
-          sum += matrix[x][y];
-          count++;
-        }
+function adjAverage(matrix, n, m) {
+    for (let x = 0; x < n; x++) {
+      for (let y = 0; y < m; y++) {
+        let sum = 0;
+        let count = 0;
+        [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].forEach(([i, j]) => {
+          if (i >= 0 && i < matrix.length && j >= 0 && j < matrix[0].length) {
+            sum += matrix[i][j];
+            count++;
+          }
+        });
+        process.stdout.write((Math.floor(sum / count * 10) / 10).toFixed(1) + " ");
       }
+      process.stdout.write("\n");
     }
-    return sum / count;
 }
 
 const matrix = [
@@ -19,4 +21,4 @@ const matrix = [
     [7, 8, 9],
 ];
 
-console.log(adjAverage(matrix, 1, 1)); // 5
+adjAverage(matrix, 3, 3);

@@ -15,6 +15,7 @@ main:
     lw      $s2,            m                           # $s2 = m
     li      $t8,            0                           # $t8 = row
     li      $t9,            0                           # $t9 = column
+    j       outer_loop
 
 # Outer loop (rows)
 outer_loop:

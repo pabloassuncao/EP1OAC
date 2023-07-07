@@ -4,8 +4,6 @@ space: .asciiz " "                                      # String para imprimir u
 matriz: .word 1, 2, 3, 4, 5, 6, 7, 8, 9                 # Matriz row-major order
 n: .word 3                                              # Tamanho da matriz
 m: .word 3                                              # Tamanho da matriz
-x: .word 1                                              # Número da linha i para calcular a média
-y: .word 0                                              # Número da coluna j para calcular a média
 
 .text
 
